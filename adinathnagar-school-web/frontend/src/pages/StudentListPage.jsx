@@ -37,16 +37,12 @@ const StudentListPage = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, [selectedStandard, selectedGender]); // Reload when select filters change (search handles locally or debounced/on button click)
+  }, []); // Fetch all students once on mount
 
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const params = { status: 'Active' }; // Only list Active students on this page (Javak is in Javak Register)
-      if (selectedStandard !== '') params.standard = selectedStandard;
-      if (selectedGender !== '') params.gender = selectedGender;
-      
-      const data = await studentAPI.getAll(params);
+      const data = await studentAPI.getAll(); // Standard and gender filters are applied locally
       setStudents(data);
       setError('');
     } catch (err) {
@@ -57,12 +53,17 @@ const StudentListPage = () => {
     }
   };
 
-  // Local filtering for search so we don't spam the DB
+  // Local filtering for search, standard, and gender so it filters instantly
   const filteredStudents = students.filter(student => {
     const term = searchTerm.toLowerCase();
     const gr = student.grNo?.toString() || '';
     const name = student.fullName?.toLowerCase() || '';
-    return name.includes(term) || gr.includes(term);
+    const matchesSearch = name.includes(term) || gr.includes(term);
+
+    const matchesStandard = selectedStandard === '' || student.standard?.toString() === selectedStandard;
+    const matchesGender = selectedGender === '' || student.gender === selectedGender;
+
+    return matchesSearch && matchesStandard && matchesGender;
   });
 
   const handleDelete = async (id, name) => {
@@ -409,7 +410,7 @@ const modalContentStyle = {
   width: '100%',
   maxWidth: '460px',
   padding: '2rem',
-  backgroundColor: '#12161b',
+  backgroundColor: 'var(--bg-secondary)',
 };
 
 const modalHeaderStyle = {

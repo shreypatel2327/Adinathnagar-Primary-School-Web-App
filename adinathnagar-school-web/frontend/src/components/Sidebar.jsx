@@ -30,7 +30,7 @@ const Sidebar = ({ collapsed }) => {
   );
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={sidebarStyle}>
+    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={{ ...sidebarStyle, width: collapsed ? '80px' : '260px' }}>
       <div className="sidebar-logo" style={logoStyle}>
         <GraduationCap size={collapsed ? 28 : 36} color="#2b8cee" />
         {!collapsed && (
@@ -80,8 +80,8 @@ const sidebarStyle = {
   left: 0,
   height: '100vh',
   width: '260px',
-  backgroundColor: '#12161b',
-  borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+  backgroundColor: 'var(--bg-secondary)',
+  borderRight: '1px solid var(--border-color)',
   display: 'flex',
   flexDirection: 'column',
   zIndex: 100,
@@ -95,7 +95,7 @@ const logoStyle = {
   alignItems: 'center',
   padding: '1.5rem 1.25rem',
   gap: '12px',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+  borderBottom: '1px solid var(--border-color)',
   height: '70px',
   boxSizing: 'border-box',
 };
@@ -126,7 +126,7 @@ const navItemStyle = {
 
 const footerStyle = {
   padding: '1.5rem 0',
-  borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+  borderTop: '1px solid var(--border-color)',
 };
 
 const logoutButtonStyle = {

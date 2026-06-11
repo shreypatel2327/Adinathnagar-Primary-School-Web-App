@@ -14,7 +14,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("SELECT s FROM Student s WHERE s.status = 'Active' AND " +
            "(LOWER(s.fullName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "CAST(s.grNo AS string) LIKE CONCAT('%', :query, '%') OR " +
+           "CONCAT(s.grNo, '') LIKE CONCAT('%', :query, '%') OR " +
            "s.mobile LIKE CONCAT('%', :query, '%'))")
     List<Student> searchActiveStudents(@Param("query") String query);
 

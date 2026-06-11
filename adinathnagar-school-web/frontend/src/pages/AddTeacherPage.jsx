@@ -63,7 +63,7 @@ const AddTeacherPage = () => {
         username: formData.username,
         fullName: formData.fullName,
         isActive: formData.isActive,
-        standard: formData.standard !== '' ? parseInt(formData.standard, 10) : null,
+        standard: formData.standard !== '' ? formData.standard.toString() : null,
       };
 
       // Only include password if provided (for both create and edit)
