@@ -12,11 +12,19 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     List<Student> findByStatusOrderByGrNoAsc(String status);
 
+    List<Student> findByStatusAndStandardOrderByGrNoAsc(String status, Integer standard);
+
     @Query("SELECT s FROM Student s WHERE s.status = 'Active' AND " +
            "(LOWER(s.fullName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "CONCAT(s.grNo, '') LIKE CONCAT('%', :query, '%') OR " +
            "s.mobile LIKE CONCAT('%', :query, '%'))")
     List<Student> searchActiveStudents(@Param("query") String query);
+
+    @Query("SELECT s FROM Student s WHERE s.status = 'Active' AND s.standard = :standard AND " +
+           "(LOWER(s.fullName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "CONCAT(s.grNo, '') LIKE CONCAT('%', :query, '%') OR " +
+           "s.mobile LIKE CONCAT('%', :query, '%'))")
+    List<Student> searchActiveStudentsByStandard(@Param("query") String query, @Param("standard") Integer standard);
 
     Optional<Student> findByGrNo(Integer grNo);
 

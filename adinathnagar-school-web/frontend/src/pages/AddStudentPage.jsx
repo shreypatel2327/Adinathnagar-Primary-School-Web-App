@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { studentAPI } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, Save, User, Users, CreditCard, GraduationCap } from 'lucide-react';
 
 const AddStudentPage = () => {
+  const { user } = useAuth();
   const { id } = useParams();
   const isEditMode = !!id;
   const navigate = useNavigate();
@@ -85,8 +87,10 @@ const AddStudentPage = () => {
         }
       };
       fetchStudent();
+    } else if (user?.role === 'TEACHER') {
+      setFormData(prev => ({ ...prev, standard: user.standard || '1' }));
     }
-  }, [id, isEditMode]);
+  }, [id, isEditMode, user]);
 
   // Handle Input Changes
   const handleChange = (e) => {
@@ -206,7 +210,7 @@ const AddStudentPage = () => {
         <div className="glass-card">
           {/* PERSONAL TAB */}
           {activeTab === 'personal' && (
-            <div style={formGridStyle}>
+            <div className="student-form-grid">
               <div className="form-group">
                 <label className="form-label">જી.આર. નંબર (GR No) *</label>
                 <input
@@ -292,6 +296,7 @@ const AddStudentPage = () => {
                   value={formData.standard}
                   onChange={handleChange}
                   required
+                  disabled={user?.role === 'TEACHER'}
                 >
                   <option value="0">બાલવાટિકા (Balwatika)</option>
                   <option value="1">ધોરણ ૧</option>
@@ -372,7 +377,7 @@ const AddStudentPage = () => {
 
           {/* FAMILY TAB */}
           {activeTab === 'family' && (
-            <div style={formGridStyle}>
+            <div className="student-form-grid">
               <div className="form-group" style={{ gridColumn: 'span 2' }}>
                 <label className="form-label">પિતાનું પૂરું નામ</label>
                 <input
@@ -487,7 +492,7 @@ const AddStudentPage = () => {
 
           {/* GOVT & BANK TAB */}
           {activeTab === 'govt' && (
-            <div style={formGridStyle}>
+            <div className="student-form-grid">
               <div className="form-group">
                 <label className="form-label">વિદ્યાર્થીનો આધાર નંબર</label>
                 <input
@@ -614,7 +619,7 @@ const AddStudentPage = () => {
 
           {/* ACADEMIC TAB */}
           {activeTab === 'academic' && (
-            <div style={formGridStyle}>
+            <div className="student-form-grid">
               <div className="form-group">
                 <label className="form-label">પ્રવેશ તારીખ (Admission Date)</label>
                 <input

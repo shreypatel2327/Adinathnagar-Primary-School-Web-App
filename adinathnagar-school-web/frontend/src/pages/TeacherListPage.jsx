@@ -85,7 +85,7 @@ const TeacherListPage = () => {
               {teachers.map((t) => (
                 <tr key={t.id}>
                   <td style={{ fontWeight: '600', color: '#2b8cee' }}>{t.username}</td>
-                  <td style={{ fontWeight: '600', color: '#f8fafc' }}>{t.fullName}</td>
+                  <td style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{t.fullName}</td>
                   <td>
                     <span className="badge badge-warning" style={{ backgroundColor: 'rgba(245, 158, 11, 0.12)' }}>
                       {getStandardLabel(t.standard)}

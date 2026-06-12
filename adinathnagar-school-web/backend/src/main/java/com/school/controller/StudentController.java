@@ -27,14 +27,36 @@ public class StudentController {
     @Autowired
     private SystemLogRepository logRepository;
 
+    private Integer getTeacherStandard(User user) {
+        if (user == null || user.getStandard() == null) return null;
+        try {
+            if ("Balwatika".equalsIgnoreCase(user.getStandard())) return 0;
+            return Integer.parseInt(user.getStandard());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     // GET /api/students
     @GetMapping("/students")
-    public ResponseEntity<?> getStudents(@RequestParam(required = false) String search) {
+    public ResponseEntity<?> getStudents(@RequestParam(required = false) String search, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName()).orElse(null);
+        boolean isTeacher = user != null && "TEACHER".equalsIgnoreCase(user.getRole());
+
         List<Student> students;
-        if (search != null && !search.isEmpty()) {
-            students = studentRepository.searchActiveStudents(search);
+        if (isTeacher) {
+            Integer std = getTeacherStandard(user);
+            if (search != null && !search.isEmpty()) {
+                students = studentRepository.searchActiveStudentsByStandard(search, std);
+            } else {
+                students = studentRepository.findByStatusAndStandardOrderByGrNoAsc("Active", std);
+            }
         } else {
-            students = studentRepository.findByStatusOrderByGrNoAsc("Active");
+            if (search != null && !search.isEmpty()) {
+                students = studentRepository.searchActiveStudents(search);
+            } else {
+                students = studentRepository.findByStatusOrderByGrNoAsc("Active");
+            }
         }
         return ResponseEntity.ok(studentsToMapList(students));
     }
@@ -43,12 +65,19 @@ public class StudentController {
     @PostMapping("/students")
     public ResponseEntity<?> createStudent(@RequestBody Map<String, Object> body, Authentication auth) {
         try {
+            User user = userRepository.findByUsername(auth.getName()).orElse(null);
+            boolean isTeacher = user != null && "TEACHER".equalsIgnoreCase(user.getRole());
+
             // Auto-generate GR No
             int nextGrNo = studentRepository.findMaxGrNo().orElse(1000) + 1;
 
             Student student = mapToStudent(body, new Student());
             student.setGrNo(nextGrNo);
             student.setStatus("Active");
+
+            if (isTeacher) {
+                student.setStandard(getTeacherStandard(user));
+            }
 
             Student saved = studentRepository.save(student);
             logAction(auth, "CREATE", saved.getFullName(), "Added Student: " + saved.getFullName() + " (GR: " + saved.getGrNo() + ")");
@@ -61,17 +90,42 @@ public class StudentController {
 
     // GET /api/students/{id}
     @GetMapping("/students/{id}")
-    public ResponseEntity<?> getStudentById(@PathVariable String id) {
-        return studentRepository.findById(id)
-            .map(s -> ResponseEntity.ok(studentToMap(s)))
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getStudentById(@PathVariable String id, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName()).orElse(null);
+        boolean isTeacher = user != null && "TEACHER".equalsIgnoreCase(user.getRole());
+
+        Optional<Student> studentOpt = studentRepository.findById(id);
+        if (studentOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Student s = studentOpt.get();
+        if (isTeacher) {
+            Integer std = getTeacherStandard(user);
+            if (s.getStandard() == null || !s.getStandard().equals(std)) {
+                return ResponseEntity.status(403).body(Map.of("error", "You do not have access to students of this class."));
+            }
+        }
+        return ResponseEntity.ok(studentToMap(s));
     }
 
     // PUT /api/students/{id}
     @PutMapping("/students/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable String id, @RequestBody Map<String, Object> body, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName()).orElse(null);
+        boolean isTeacher = user != null && "TEACHER".equalsIgnoreCase(user.getRole());
+
         return studentRepository.findById(id).map(student -> {
+            if (isTeacher) {
+                Integer std = getTeacherStandard(user);
+                if (student.getStandard() == null || !student.getStandard().equals(std)) {
+                    return ResponseEntity.status(403).body(Map.of("error", "You do not have access to edit students of this class."));
+                }
+            }
             mapToStudent(body, student);
+            if (isTeacher) {
+                student.setStandard(getTeacherStandard(user));
+            }
             Student saved = studentRepository.save(student);
             logAction(auth, "UPDATE", saved.getFullName(), "Edited Student: " + saved.getFullName());
             return ResponseEntity.ok(studentToMap(saved));

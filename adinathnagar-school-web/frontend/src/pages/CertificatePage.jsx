@@ -66,11 +66,12 @@ const CertificatePage = () => {
   const englishName = `${lastName} ${firstName} ${middleName}`.toUpperCase().trim();
 
   // Stylesheet injection
+  // Stylesheet injection
   const cssStyles = isBonafide ? `
-    @page { size: A4 portrait; margin: 10mm; }
+    @page { size: A4 portrait; margin: 0; }
     .bonafide-cert {
       font-family: 'Mukta Vaani', sans-serif;
-      padding: 20px;
+      padding: 20mm;
       line-height: 2.5;
       color: #000;
       font-size: 18px;
@@ -92,11 +93,11 @@ const CertificatePage = () => {
     .bonafide-cert .footer-table td { font-size: 18px; font-weight: bold; text-align: center; vertical-align: bottom; }
     .bonafide-cert .sign-area { margin-top: 10px; border-top: 1.5px solid black; width: 160px; display: inline-block; }
   ` : `
-    @page { size: A4 portrait; margin: 5mm; }
+    @page { size: A4 portrait; margin: 0; }
     .valiform-cert {
       font-family: 'Mukta Vaani', sans-serif;
       margin: 0;
-      padding: 4mm;
+      padding: 10mm;
       font-size: 13px;
       color: #000;
       background-color: #ffffff;
@@ -116,7 +117,7 @@ const CertificatePage = () => {
   `;
 
   return (
-    <div style={pageContainerStyle}>
+    <div className="certificate-page-container" style={pageContainerStyle}>
       <style dangerouslySetInnerHTML={{ __html: cssStyles }} />
       
       {/* Action Header - Hidden during print */}
@@ -137,7 +138,7 @@ const CertificatePage = () => {
       </div>
 
       {/* Preview scale wrapper to fit A4 on screen nicely */}
-      <div style={previewScaleWrapperStyle}>
+      <div className="certificate-preview-scale-wrapper" style={previewScaleWrapperStyle}>
         <div className="print-wrapper">
           {isBonafide ? (
             /* BONAFIDE CERTIFICATE CUSTOM HTML DESIGN */

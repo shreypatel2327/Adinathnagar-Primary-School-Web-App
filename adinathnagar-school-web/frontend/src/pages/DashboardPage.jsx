@@ -128,7 +128,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Quick Actions & Recent Activity */}
-      <div style={mainGridStyle}>
+      <div className="dashboard-main-grid">
         {/* Quick Actions */}
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -143,16 +143,16 @@ const DashboardPage = () => {
               <ClipboardList size={24} color="#10b981" />
               <span>વિદ્યાર્થી યાદી</span>
             </button>
-            <button onClick={() => navigate('/aavak-register')} style={actionButtonStyle}>
-              <ArrowDownLeft size={24} color="#f59e0b" />
-              <span>આવક રજીસ્ટર</span>
-            </button>
-            <button onClick={() => navigate('/javak-register')} style={actionButtonStyle}>
-              <ArrowUpRight size={24} color="#f43f5e" />
-              <span>જાવક રજીસ્ટર</span>
-            </button>
             {isAdmin && (
               <>
+                <button onClick={() => navigate('/aavak-register')} style={actionButtonStyle}>
+                  <ArrowDownLeft size={24} color="#f59e0b" />
+                  <span>આવક રજીસ્ટર</span>
+                </button>
+                <button onClick={() => navigate('/javak-register')} style={actionButtonStyle}>
+                  <ArrowUpRight size={24} color="#f43f5e" />
+                  <span>જાવક રજીસ્ટર</span>
+                </button>
                 <button onClick={() => navigate('/teachers')} style={actionButtonStyle}>
                   <UserCheck size={24} color="#c084fc" />
                   <span>શિક્ષક સંચાલન</span>
@@ -251,7 +251,7 @@ const iconWrapperStyle = {
 const statValueStyle = {
   fontSize: '2.25rem',
   fontWeight: '700',
-  color: '#fff',
+  color: 'var(--text-primary)',
   lineHeight: '1.2',
 };
 
@@ -281,7 +281,7 @@ const actionButtonStyle = {
   backgroundColor: 'rgba(255, 255, 255, 0.02)',
   border: '1px solid rgba(255, 255, 255, 0.06)',
   borderRadius: '12px',
-  color: '#e2e8f0',
+  color: 'var(--text-primary)',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
   fontSize: '0.9rem',

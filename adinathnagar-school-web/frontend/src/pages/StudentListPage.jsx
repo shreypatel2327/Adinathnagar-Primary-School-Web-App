@@ -24,7 +24,7 @@ const StudentListPage = () => {
   
   // Search and Filter States
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStandard, setSelectedStandard] = useState('');
+  const [selectedStandard, setSelectedStandard] = useState(user?.role === 'TEACHER' ? user.standard || '' : '');
   const [selectedGender, setSelectedGender] = useState('');
   
   // Javak Modal State
@@ -37,7 +37,10 @@ const StudentListPage = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, []); // Fetch all students once on mount
+    if (user?.role === 'TEACHER') {
+      setSelectedStandard(user.standard || '');
+    }
+  }, [user]);
 
   const fetchStudents = async () => {
     try {
@@ -163,6 +166,7 @@ const StudentListPage = () => {
               className="form-control"
               value={selectedStandard}
               onChange={(e) => setSelectedStandard(e.target.value)}
+              disabled={user?.role === 'TEACHER'}
               style={{ width: '100%' }}
             >
               <option value="">તમામ ધોરણ</option>
@@ -213,7 +217,7 @@ const StudentListPage = () => {
                 <tr key={student.id}>
                   <td style={{ fontWeight: '600', color: '#2b8cee' }}>{student.grNo}</td>
                   <td>
-                    <Link to={`/students/${student.id}`} style={{ fontWeight: '600', color: '#f8fafc' }}>
+                    <Link to={`/students/${student.id}`} style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
                       {student.fullName}
                     </Link>
                   </td>
@@ -243,14 +247,16 @@ const StudentListPage = () => {
                       >
                         <Edit2 size={16} />
                       </Link>
-                      <button 
-                        onClick={() => openJavakModal(student)} 
-                        className="btn btn-secondary" 
-                        style={{ ...actionIconButtonStyle, color: '#f43f5e' }}
-                        title="જાવક (દાખલ કમી)"
-                      >
-                        <UserMinus size={16} />
-                      </button>
+                      {isAdmin && (
+                        <button 
+                          onClick={() => openJavakModal(student)} 
+                          className="btn btn-secondary" 
+                          style={{ ...actionIconButtonStyle, color: '#f43f5e' }}
+                          title="જાવક (દાખલ કમી)"
+                        >
+                          <UserMinus size={16} />
+                        </button>
+                      )}
                       {isAdmin && (
                         <button 
                           onClick={() => handleDelete(student.id, student.fullName)} 

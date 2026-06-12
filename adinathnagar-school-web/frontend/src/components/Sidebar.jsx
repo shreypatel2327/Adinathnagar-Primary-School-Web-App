@@ -13,14 +13,20 @@ import {
   GraduationCap
 } from 'lucide-react';
 
-const Sidebar = ({ collapsed }) => {
+const Sidebar = ({ collapsed, toggleSidebar }) => {
   const { user, logout, isAdmin } = useAuth();
+
+  const handleLinkClick = () => {
+    if (window.innerWidth <= 768 && toggleSidebar) {
+      toggleSidebar();
+    }
+  };
 
   const navItems = [
     { path: '/dashboard', label: 'ડેસ્કબોર્ડ', icon: LayoutDashboard, roles: ['ADMIN', 'TEACHER'] },
     { path: '/students', label: 'વિદ્યાર્થીઓ', icon: Users, roles: ['ADMIN', 'TEACHER'] },
-    { path: '/aavak-register', label: 'આવક રજીસ્ટર', icon: ArrowDownLeft, roles: ['ADMIN', 'TEACHER'] },
-    { path: '/javak-register', label: 'જાવક રજીસ્ટર', icon: ArrowUpRight, roles: ['ADMIN', 'TEACHER'] },
+    { path: '/aavak-register', label: 'આવક રજીસ્ટર', icon: ArrowDownLeft, roles: ['ADMIN'] },
+    { path: '/javak-register', label: 'જાવક રજીસ્ટર', icon: ArrowUpRight, roles: ['ADMIN'] },
     { path: '/teachers', label: 'શિક્ષકો', icon: UserCheck, roles: ['ADMIN'] },
     { path: '/system-logs', label: 'સિસ્ટમ લોગ', icon: History, roles: ['ADMIN'] },
   ];
@@ -46,6 +52,7 @@ const Sidebar = ({ collapsed }) => {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={handleLinkClick}
             style={({ isActive }) => ({
               ...navItemStyle,
               backgroundColor: isActive ? 'rgba(43, 140, 238, 0.12)' : 'transparent',
