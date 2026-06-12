@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { studentAPI } from '../api/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { 
   Search, 
   Filter, 
@@ -16,6 +17,7 @@ import {
 
 const StudentListPage = () => {
   const { user, isAdmin } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   
   const [students, setStudents] = useState([]);
@@ -24,7 +26,7 @@ const StudentListPage = () => {
   
   // Search and Filter States
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStandard, setSelectedStandard] = useState('');
+  const [selectedStandard, setSelectedStandard] = useState(user?.role === 'TEACHER' ? user.standard || '' : '');
   const [selectedGender, setSelectedGender] = useState('');
   
   // Javak Modal State
@@ -37,16 +39,15 @@ const StudentListPage = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, [selectedStandard, selectedGender]); // Reload when select filters change (search handles locally or debounced/on button click)
+    if (user?.role === 'TEACHER') {
+      setSelectedStandard(user.standard || '');
+    }
+  }, [user]);
 
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const params = { status: 'Active' }; // Only list Active students on this page (Javak is in Javak Register)
-      if (selectedStandard !== '') params.standard = selectedStandard;
-      if (selectedGender !== '') params.gender = selectedGender;
-      
-      const data = await studentAPI.getAll(params);
+      const data = await studentAPI.getAll(); // Standard and gender filters are applied locally
       setStudents(data);
       setError('');
     } catch (err) {
@@ -57,23 +58,28 @@ const StudentListPage = () => {
     }
   };
 
-  // Local filtering for search so we don't spam the DB
+  // Local filtering for search, standard, and gender so it filters instantly
   const filteredStudents = students.filter(student => {
     const term = searchTerm.toLowerCase();
     const gr = student.grNo?.toString() || '';
     const name = student.fullName?.toLowerCase() || '';
-    return name.includes(term) || gr.includes(term);
+    const matchesSearch = name.includes(term) || gr.includes(term);
+
+    const matchesStandard = selectedStandard === '' || student.standard?.toString() === selectedStandard;
+    const matchesGender = selectedGender === '' || student.gender === selectedGender;
+
+    return matchesSearch && matchesStandard && matchesGender;
   });
 
   const handleDelete = async (id, name) => {
     if (window.confirm(`શું તમે ખરેખર વિદ્યાર્થી "${name}" ને રદ કરવા માંગો છો? આ ક્રિયા પાછી ખેંચી શકાશે નહીં.`)) {
       try {
         await studentAPI.delete(id);
-        alert('વિદ્યાર્થી સફળતાપૂર્વક રદ કરવામાં આવ્યો છે.');
+        showToast('વિદ્યાર્થી સફળતાપૂર્વક રદ કરવામાં આવ્યો છે.', 'success');
         fetchStudents();
       } catch (err) {
         console.error('Error deleting student:', err);
-        alert('વિદ્યાર્થી રદ કરવામાં નિષ્ફળતા.');
+        showToast('વિદ્યાર્થી રદ કરવામાં નિષ્ફળતા.', 'error');
       }
     }
   };
@@ -94,7 +100,7 @@ const StudentListPage = () => {
   const handleJavakSubmit = async (e) => {
     e.preventDefault();
     if (!leavingDate || !destinationSchool) {
-      alert('કૃપા કરીને જવા તારીખ અને નવી શાળાનું નામ દાખલ કરો.');
+      showToast('કૃપા કરીને જવા તારીખ અને નવી શાળાનું નામ દાખલ કરો.', 'warning');
       return;
     }
 
@@ -105,12 +111,12 @@ const StudentListPage = () => {
         destinationSchool,
         remarks
       });
-      alert('વિદ્યાર્થીને સફળતાપૂર્વક જાવક તરીકે માર્ક કરેલ છે.');
+      showToast('વિદ્યાર્થીને સફળતાપૂર્વક જાવક તરીકે માર્ક કરેલ છે.', 'success');
       closeJavakModal();
       fetchStudents(); // Refresh
     } catch (err) {
       console.error('Error marking javak:', err);
-      alert('જાવક પ્રક્રિયામાં ક્ષતિ આવી.');
+      showToast('જાવક પ્રક્રિયામાં ક્ષતિ આવી.', 'error');
     } finally {
       setJavakSubmitting(false);
     }
@@ -162,6 +168,7 @@ const StudentListPage = () => {
               className="form-control"
               value={selectedStandard}
               onChange={(e) => setSelectedStandard(e.target.value)}
+              disabled={user?.role === 'TEACHER'}
               style={{ width: '100%' }}
             >
               <option value="">તમામ ધોરણ</option>
@@ -212,7 +219,7 @@ const StudentListPage = () => {
                 <tr key={student.id}>
                   <td style={{ fontWeight: '600', color: '#2b8cee' }}>{student.grNo}</td>
                   <td>
-                    <Link to={`/students/${student.id}`} style={{ fontWeight: '600', color: '#f8fafc' }}>
+                    <Link to={`/students/${student.id}`} style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
                       {student.fullName}
                     </Link>
                   </td>
@@ -242,14 +249,16 @@ const StudentListPage = () => {
                       >
                         <Edit2 size={16} />
                       </Link>
-                      <button 
-                        onClick={() => openJavakModal(student)} 
-                        className="btn btn-secondary" 
-                        style={{ ...actionIconButtonStyle, color: '#f43f5e' }}
-                        title="જાવક (દાખલ કમી)"
-                      >
-                        <UserMinus size={16} />
-                      </button>
+                      {isAdmin && (
+                        <button 
+                          onClick={() => openJavakModal(student)} 
+                          className="btn btn-secondary" 
+                          style={{ ...actionIconButtonStyle, color: '#f43f5e' }}
+                          title="જાવક (દાખલ કમી)"
+                        >
+                          <UserMinus size={16} />
+                        </button>
+                      )}
                       {isAdmin && (
                         <button 
                           onClick={() => handleDelete(student.id, student.fullName)} 
@@ -409,7 +418,7 @@ const modalContentStyle = {
   width: '100%',
   maxWidth: '460px',
   padding: '2rem',
-  backgroundColor: '#12161b',
+  backgroundColor: 'var(--bg-secondary)',
 };
 
 const modalHeaderStyle = {

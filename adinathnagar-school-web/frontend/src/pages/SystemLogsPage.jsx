@@ -152,8 +152,8 @@ const SystemLogsPage = () => {
                       {log.actionType}
                     </span>
                   </td>
-                  <td style={{ fontWeight: '600', color: '#f8fafc' }}>{log.title}</td>
-                  <td style={{ color: '#e2e8f0', maxWidth: '350px', wordBreak: 'break-word' }}>{log.description}</td>
+                  <td style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{log.title}</td>
+                  <td style={{ color: 'var(--text-primary)', maxWidth: '350px', wordBreak: 'break-word' }}>{log.description}</td>
                   <td style={{ fontWeight: '500', color: '#2b8cee' }}>{log.user?.fullName || 'સિસ્ટમ'}</td>
                   <td style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
                     {log.createdAt ? new Date(log.createdAt).toLocaleString('gu-IN', {

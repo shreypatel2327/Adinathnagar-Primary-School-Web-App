@@ -13,14 +13,20 @@ import {
   GraduationCap
 } from 'lucide-react';
 
-const Sidebar = ({ collapsed }) => {
+const Sidebar = ({ collapsed, toggleSidebar }) => {
   const { user, logout, isAdmin } = useAuth();
+
+  const handleLinkClick = () => {
+    if (window.innerWidth <= 768 && toggleSidebar) {
+      toggleSidebar();
+    }
+  };
 
   const navItems = [
     { path: '/dashboard', label: 'ડેસ્કબોર્ડ', icon: LayoutDashboard, roles: ['ADMIN', 'TEACHER'] },
     { path: '/students', label: 'વિદ્યાર્થીઓ', icon: Users, roles: ['ADMIN', 'TEACHER'] },
-    { path: '/aavak-register', label: 'આવક રજીસ્ટર', icon: ArrowDownLeft, roles: ['ADMIN', 'TEACHER'] },
-    { path: '/javak-register', label: 'જાવક રજીસ્ટર', icon: ArrowUpRight, roles: ['ADMIN', 'TEACHER'] },
+    { path: '/aavak-register', label: 'આવક રજીસ્ટર', icon: ArrowDownLeft, roles: ['ADMIN'] },
+    { path: '/javak-register', label: 'જાવક રજીસ્ટર', icon: ArrowUpRight, roles: ['ADMIN'] },
     { path: '/teachers', label: 'શિક્ષકો', icon: UserCheck, roles: ['ADMIN'] },
     { path: '/system-logs', label: 'સિસ્ટમ લોગ', icon: History, roles: ['ADMIN'] },
   ];
@@ -30,12 +36,12 @@ const Sidebar = ({ collapsed }) => {
   );
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={sidebarStyle}>
+    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} style={{ ...sidebarStyle, width: collapsed ? '80px' : '260px' }}>
       <div className="sidebar-logo" style={logoStyle}>
         <GraduationCap size={collapsed ? 28 : 36} color="#2b8cee" />
         {!collapsed && (
           <div style={logoTextStyle}>
-            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: '#fff' }}>આદિનાથનગર</span>
+            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-primary)' }}>આદિનાથનગર</span>
             <span style={{ fontSize: '0.75rem', color: '#2b8cee', marginTop: '-4px' }}>પ્રાથમિક શાળા</span>
           </div>
         )}
@@ -46,6 +52,7 @@ const Sidebar = ({ collapsed }) => {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={handleLinkClick}
             style={({ isActive }) => ({
               ...navItemStyle,
               backgroundColor: isActive ? 'rgba(43, 140, 238, 0.12)' : 'transparent',
@@ -80,8 +87,8 @@ const sidebarStyle = {
   left: 0,
   height: '100vh',
   width: '260px',
-  backgroundColor: '#12161b',
-  borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+  backgroundColor: 'var(--bg-secondary)',
+  borderRight: '1px solid var(--border-color)',
   display: 'flex',
   flexDirection: 'column',
   zIndex: 100,
@@ -95,7 +102,7 @@ const logoStyle = {
   alignItems: 'center',
   padding: '1.5rem 1.25rem',
   gap: '12px',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+  borderBottom: '1px solid var(--border-color)',
   height: '70px',
   boxSizing: 'border-box',
 };
@@ -126,7 +133,7 @@ const navItemStyle = {
 
 const footerStyle = {
   padding: '1.5rem 0',
-  borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+  borderTop: '1px solid var(--border-color)',
 };
 
 const logoutButtonStyle = {
