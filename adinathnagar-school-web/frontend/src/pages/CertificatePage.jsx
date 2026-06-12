@@ -92,6 +92,15 @@ const CertificatePage = () => {
     .bonafide-cert .footer-table { width: 100%; margin-top: 80px; }
     .bonafide-cert .footer-table td { font-size: 18px; font-weight: bold; text-align: center; vertical-align: bottom; }
     .bonafide-cert .sign-area { margin-top: 10px; border-top: 1.5px solid black; width: 160px; display: inline-block; }
+    @media print {
+      @page { size: A4 portrait; margin: 15mm; }
+      .bonafide-cert {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+      }
+    }
   ` : `
     @page { size: A4 portrait; margin: 0; }
     .valiform-cert {
@@ -114,6 +123,15 @@ const CertificatePage = () => {
     .valiform-cert .left-align-bold { text-align: left; font-weight: bold; padding-left: 5px; vertical-align: middle; }
     .valiform-cert .header-logo { width: 80px; }
     .valiform-cert .photo-box { width: 100px; height: 120px; border: 1.2px solid black; text-align: center; vertical-align: middle; }
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      .valiform-cert {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+      }
+    }
   `;
 
   return (

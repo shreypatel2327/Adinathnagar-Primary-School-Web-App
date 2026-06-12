@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { studentAPI } from '../api/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { ArrowLeft, Save, User, Users, CreditCard, GraduationCap } from 'lucide-react';
 
 const AddStudentPage = () => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const { id } = useParams();
   const isEditMode = !!id;
   const navigate = useNavigate();
@@ -133,10 +135,10 @@ const AddStudentPage = () => {
 
       if (isEditMode) {
         await studentAPI.update(id, payload);
-        alert('વિદ્યાર્થીની વિગતો સફળતાપૂર્વક અપડેટ કરવામાં આવી છે.');
+        showToast('વિદ્યાર્થીની વિગતો સફળતાપૂર્વક અપડેટ કરવામાં આવી છે.', 'success');
       } else {
         await studentAPI.create(payload);
-        alert('નવો વિદ્યાર્થી સફળતાપૂર્વક ઉમેરવામાં આવ્યો છે.');
+        showToast('નવો વિદ્યાર્થી સફળતાપૂર્વક ઉમેરવામાં આવ્યો છે.', 'success');
       }
       navigate('/students');
     } catch (err) {

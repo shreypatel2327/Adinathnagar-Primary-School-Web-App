@@ -41,7 +41,7 @@ const Sidebar = ({ collapsed, toggleSidebar }) => {
         <GraduationCap size={collapsed ? 28 : 36} color="#2b8cee" />
         {!collapsed && (
           <div style={logoTextStyle}>
-            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: '#fff' }}>આદિનાથનગર</span>
+            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-primary)' }}>આદિનાથનગર</span>
             <span style={{ fontSize: '0.75rem', color: '#2b8cee', marginTop: '-4px' }}>પ્રાથમિક શાળા</span>
           </div>
         )}

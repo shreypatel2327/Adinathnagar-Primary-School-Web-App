@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { teacherAPI } from '../api/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { ArrowLeft, Save, ShieldAlert } from 'lucide-react';
 
 const AddTeacherPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin } = useAuth();
+  const { showToast } = useToast();
   
   // Check if editing via route state
   const editTeacherData = location.state?.teacher;
@@ -73,10 +75,10 @@ const AddTeacherPage = () => {
 
       if (isEditMode) {
         await teacherAPI.update(editTeacherData.id, payload);
-        alert('શિક્ષકની વિગતો સફળતાપૂર્વક અપડેટ કરવામાં આવી છે.');
+        showToast('શિક્ષકની વિગતો સફળતાપૂર્વક અપડેટ કરવામાં આવી છે.', 'success');
       } else {
         await teacherAPI.create(payload);
-        alert('નવા શિક્ષક સફળતાપૂર્વક ઉમેરવામાં આવ્યા છે.');
+        showToast('નવા શિક્ષક સફળતાપૂર્વક ઉમેરવામાં આવ્યા છે.', 'success');
       }
       navigate('/teachers');
     } catch (err) {

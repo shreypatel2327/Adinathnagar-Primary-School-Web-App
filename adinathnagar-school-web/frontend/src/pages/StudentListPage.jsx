@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { studentAPI } from '../api/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { 
   Search, 
   Filter, 
@@ -16,6 +17,7 @@ import {
 
 const StudentListPage = () => {
   const { user, isAdmin } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   
   const [students, setStudents] = useState([]);
@@ -73,11 +75,11 @@ const StudentListPage = () => {
     if (window.confirm(`શું તમે ખરેખર વિદ્યાર્થી "${name}" ને રદ કરવા માંગો છો? આ ક્રિયા પાછી ખેંચી શકાશે નહીં.`)) {
       try {
         await studentAPI.delete(id);
-        alert('વિદ્યાર્થી સફળતાપૂર્વક રદ કરવામાં આવ્યો છે.');
+        showToast('વિદ્યાર્થી સફળતાપૂર્વક રદ કરવામાં આવ્યો છે.', 'success');
         fetchStudents();
       } catch (err) {
         console.error('Error deleting student:', err);
-        alert('વિદ્યાર્થી રદ કરવામાં નિષ્ફળતા.');
+        showToast('વિદ્યાર્થી રદ કરવામાં નિષ્ફળતા.', 'error');
       }
     }
   };
@@ -98,7 +100,7 @@ const StudentListPage = () => {
   const handleJavakSubmit = async (e) => {
     e.preventDefault();
     if (!leavingDate || !destinationSchool) {
-      alert('કૃપા કરીને જવા તારીખ અને નવી શાળાનું નામ દાખલ કરો.');
+      showToast('કૃપા કરીને જવા તારીખ અને નવી શાળાનું નામ દાખલ કરો.', 'warning');
       return;
     }
 
@@ -109,12 +111,12 @@ const StudentListPage = () => {
         destinationSchool,
         remarks
       });
-      alert('વિદ્યાર્થીને સફળતાપૂર્વક જાવક તરીકે માર્ક કરેલ છે.');
+      showToast('વિદ્યાર્થીને સફળતાપૂર્વક જાવક તરીકે માર્ક કરેલ છે.', 'success');
       closeJavakModal();
       fetchStudents(); // Refresh
     } catch (err) {
       console.error('Error marking javak:', err);
-      alert('જાવક પ્રક્રિયામાં ક્ષતિ આવી.');
+      showToast('જાવક પ્રક્રિયામાં ક્ષતિ આવી.', 'error');
     } finally {
       setJavakSubmitting(false);
     }
