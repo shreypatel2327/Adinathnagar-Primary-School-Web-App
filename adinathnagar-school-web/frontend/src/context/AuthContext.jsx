@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../api/api';
+import api, { authAPI } from '../api/api';
 
 const AuthContext = createContext(null);
 
@@ -10,6 +10,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if token and user exist in local storage on initialization
     const initializeAuth = async () => {
+      // Trigger a background wake-up request to Render to resolve cold starts
+      api.get('/health').catch(() => {});
+
       const savedUser = await authAPI.getCurrentUser();
       if (savedUser) {
         setUser(savedUser);
