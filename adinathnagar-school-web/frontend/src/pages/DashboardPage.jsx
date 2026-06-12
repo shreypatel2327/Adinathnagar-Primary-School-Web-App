@@ -36,9 +36,11 @@ const DashboardPage = () => {
         const statsData = await dashboardAPI.getStats();
         setStats(statsData);
 
-        // Fetch logs for today or week to populate recent activity
-        const logsData = await logAPI.getLogs({ period: 'This Week' });
-        setRecentLogs(logsData.slice(0, 5)); // Keep top 5
+        // Fetch logs for today or week only for administrators
+        if (isAdmin) {
+          const logsData = await logAPI.getLogs({ period: 'This Week' });
+          setRecentLogs(logsData.slice(0, 5)); // Keep top 5
+        }
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
         setError('માહિતી લોડ કરવામાં ભૂલ આવી છે.');
@@ -48,7 +50,7 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [isAdmin]);
 
   const getGreeting = () => {
     const hrs = new Date().getHours();
@@ -128,7 +130,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Quick Actions & Recent Activity */}
-      <div style={mainGridStyle}>
+      <div className="dashboard-main-grid" style={{ gridTemplateColumns: isAdmin ? undefined : '1fr' }}>
         {/* Quick Actions */}
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -143,16 +145,16 @@ const DashboardPage = () => {
               <ClipboardList size={24} color="#10b981" />
               <span>વિદ્યાર્થી યાદી</span>
             </button>
-            <button onClick={() => navigate('/aavak-register')} style={actionButtonStyle}>
-              <ArrowDownLeft size={24} color="#f59e0b" />
-              <span>આવક રજીસ્ટર</span>
-            </button>
-            <button onClick={() => navigate('/javak-register')} style={actionButtonStyle}>
-              <ArrowUpRight size={24} color="#f43f5e" />
-              <span>જાવક રજીસ્ટર</span>
-            </button>
             {isAdmin && (
               <>
+                <button onClick={() => navigate('/aavak-register')} style={actionButtonStyle}>
+                  <ArrowDownLeft size={24} color="#f59e0b" />
+                  <span>આવક રજીસ્ટર</span>
+                </button>
+                <button onClick={() => navigate('/javak-register')} style={actionButtonStyle}>
+                  <ArrowUpRight size={24} color="#f43f5e" />
+                  <span>જાવક રજીસ્ટર</span>
+                </button>
                 <button onClick={() => navigate('/teachers')} style={actionButtonStyle}>
                   <UserCheck size={24} color="#c084fc" />
                   <span>શિક્ષક સંચાલન</span>
@@ -167,36 +169,38 @@ const DashboardPage = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <History size={20} color="#10b981" /> તાજેતરની પ્રવૃત્તિઓ
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {recentLogs.length === 0 ? (
-              <p style={{ color: '#64748b', fontSize: '0.95rem' }}>કોઈ તાજેતરની પ્રવૃત્તિઓ નથી.</p>
-            ) : (
-              recentLogs.map((log) => (
-                <div key={log.id} style={activityItemStyle}>
-                  <div style={activityBadgeStyle(log.actionType)}>
-                    {log.actionType?.substring(0, 3).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>{log.title}</div>
-                    <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{log.description}</div>
-                  </div>
-                  <div style={{ textAlign: 'right', minWidth: '80px' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      {log.user?.fullName || 'સિસ્ટમ'}
+        {isAdmin && (
+          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <History size={20} color="#10b981" /> તાજેતરની પ્રવૃત્તિઓ
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {recentLogs.length === 0 ? (
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>કોઈ તાજેતરની પ્રવૃત્તિઓ નથી.</p>
+              ) : (
+                recentLogs.map((log) => (
+                  <div key={log.id} style={activityItemStyle}>
+                    <div style={activityBadgeStyle(log.actionType)}>
+                      {log.actionType?.substring(0, 3).toUpperCase()}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
-                      {new Date(log.createdAt).toLocaleTimeString('gu-IN', { hour: '2-digit', minute: '2-digit' })}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>{log.title}</div>
+                      <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{log.description}</div>
+                    </div>
+                    <div style={{ textAlign: 'right', minWidth: '80px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        {log.user?.fullName || 'સિસ્ટમ'}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
+                        {new Date(log.createdAt).toLocaleTimeString('gu-IN', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -251,7 +255,7 @@ const iconWrapperStyle = {
 const statValueStyle = {
   fontSize: '2.25rem',
   fontWeight: '700',
-  color: '#fff',
+  color: 'var(--text-primary)',
   lineHeight: '1.2',
 };
 
@@ -281,7 +285,7 @@ const actionButtonStyle = {
   backgroundColor: 'rgba(255, 255, 255, 0.02)',
   border: '1px solid rgba(255, 255, 255, 0.06)',
   borderRadius: '12px',
-  color: '#e2e8f0',
+  color: 'var(--text-primary)',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
   fontSize: '0.9rem',

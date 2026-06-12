@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 
@@ -32,6 +33,25 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Admin Only Route Guard
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0b0d10' }}>સિસ્ટમ ચાલુ થઈ રહી છે...</div>;
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (user.role !== 'ADMIN') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
+
 // Main App Router Setup
 const AppContent = () => {
   const { user, loading } = useAuth();
@@ -54,9 +74,9 @@ const AppContent = () => {
       <Route 
         path="/certificates/:type/:id" 
         element={
-          <ProtectedRoute>
+          <AdminRoute>
             <CertificatePage />
-          </ProtectedRoute>
+          </AdminRoute>
         } 
       />
 
@@ -66,7 +86,7 @@ const AppContent = () => {
         element={
           <ProtectedRoute>
             <div className="app-container">
-              <Sidebar collapsed={sidebarCollapsed} />
+              <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
               <div className={`main-content ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 <Topbar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
                 <main className="content-body">
@@ -76,11 +96,11 @@ const AppContent = () => {
                     <Route path="/students/add" element={<AddStudentPage />} />
                     <Route path="/students/edit/:id" element={<AddStudentPage />} />
                     <Route path="/students/:id" element={<StudentDetailPage />} />
-                    <Route path="/aavak-register" element={<AavakRegisterPage />} />
-                    <Route path="/javak-register" element={<JavakRegisterPage />} />
-                    <Route path="/teachers" element={<TeacherListPage />} />
-                    <Route path="/teachers/add" element={<AddTeacherPage />} />
-                    <Route path="/system-logs" element={<SystemLogsPage />} />
+                    <Route path="/aavak-register" element={<AdminRoute><AavakRegisterPage /></AdminRoute>} />
+                    <Route path="/javak-register" element={<AdminRoute><JavakRegisterPage /></AdminRoute>} />
+                    <Route path="/teachers" element={<AdminRoute><TeacherListPage /></AdminRoute>} />
+                    <Route path="/teachers/add" element={<AdminRoute><AddTeacherPage /></AdminRoute>} />
+                    <Route path="/system-logs" element={<AdminRoute><SystemLogsPage /></AdminRoute>} />
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                   </Routes>
                 </main>
@@ -97,7 +117,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
       </AuthProvider>
     </Router>
   );

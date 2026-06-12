@@ -76,19 +76,23 @@ const StudentDetailPage = () => {
           <Link to={`/students/edit/${student.id}`} className="btn btn-secondary" style={{ color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.3)' }}>
             <Edit size={16} /> વિગતો સુધારો
           </Link>
-          <Link to={`/certificates/bonafide/${student.id}`} className="btn btn-secondary" style={{ color: '#2b8cee', borderColor: 'rgba(43, 140, 238, 0.3)' }}>
-            <FileCheck size={16} /> બોનાફાઇડ પ્રમાણપત્ર
-          </Link>
-          <Link to={`/certificates/valiform/${student.id}`} className="btn btn-primary">
-            <FileText size={16} /> વાલી ફોર્મ
-          </Link>
+          {isAdmin && (
+            <>
+              <Link to={`/certificates/bonafide/${student.id}`} className="btn btn-secondary" style={{ color: '#2b8cee', borderColor: 'rgba(43, 140, 238, 0.3)' }}>
+                <FileCheck size={16} /> બોનાફાઇડ પ્રમાણપત્ર
+              </Link>
+              <Link to={`/certificates/valiform/${student.id}`} className="btn btn-primary">
+                <FileText size={16} /> વાલી ફોર્મ
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
       {/* Main Grid: Info card + Detail tabs */}
-      <div style={gridStyle}>
+      <div className="student-detail-grid">
         {/* Left Column: Summary Card */}
-        <div className="glass-card" style={summaryCardStyle}>
+        <div className="glass-card student-summary-card">
           <div style={avatarStyle(student.gender)}>
             {student.fullName ? student.fullName.substring(0, 1) : 'S'}
           </div>
@@ -159,7 +163,7 @@ const StudentDetailPage = () => {
           <div style={tabContentStyle}>
             {/* PROFILE TAB */}
             {activeTab === 'profile' && (
-              <div style={detailGridStyle}>
+              <div className="student-detail-info-grid">
                 <DetailItem label="પ્રથમ નામ" value={student.firstName} icon={User} />
                 <DetailItem label="પિતૃ નામ" value={student.middleName} icon={User} />
                 <DetailItem label="અટક" value={student.lastName} icon={User} />
@@ -174,7 +178,7 @@ const StudentDetailPage = () => {
 
             {/* FAMILY TAB */}
             {activeTab === 'family' && (
-              <div style={detailGridStyle}>
+              <div className="student-detail-info-grid">
                 <DetailItem label="પિતાનું પૂરું નામ" value={student.fatherName} icon={User} fullWidth />
                 <DetailItem label="પિતાનો અભ્યાસ" value={student.fatherEdu} icon={GraduationCap} />
                 <DetailItem label="પિતાનો વ્યવસાય" value={student.fatherOcc} icon={Building} />
@@ -190,7 +194,7 @@ const StudentDetailPage = () => {
 
             {/* GOVT & BANK TAB */}
             {activeTab === 'govt' && (
-              <div style={detailGridStyle}>
+              <div className="student-detail-info-grid">
                 <DetailItem label="આધાર નંબર" value={student.aadhaarNo} icon={CreditCard} />
                 <DetailItem label="આધાર કાર્ડ મુજબ નામ" value={student.nameOnAadhaar} icon={User} />
                 <DetailItem label="વિદ્યાર્થી DISE UID" value={student.uid} icon={CreditCard} />
@@ -207,7 +211,7 @@ const StudentDetailPage = () => {
 
             {/* ACADEMIC TAB */}
             {activeTab === 'academic' && (
-              <div style={detailGridStyle}>
+              <div className="student-detail-info-grid">
                 <DetailItem label="પ્રવેશ તારીખ" value={student.admissionDate ? new Date(student.admissionDate).toLocaleDateString('gu-IN') : null} icon={Calendar} />
                 <DetailItem label="શૈક્ષણિક વર્ષ" value={student.academicYear} icon={Calendar} />
                 <DetailItem label="અગાઉની શાળા" value={student.prevSchool} icon={School} />
@@ -264,7 +268,7 @@ const DetailItem = ({ label, value, icon: Icon, fullWidth, style }) => {
       </div>
       <div>
         <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>{label}</div>
-        <div style={{ fontSize: '1rem', fontWeight: '600', color: '#f8fafc', marginTop: '2px', wordBreak: 'break-word' }}>
+        <div style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px', wordBreak: 'break-word' }}>
           {value !== undefined && value !== null && value !== '' ? value.toString() : '-'}
         </div>
       </div>
@@ -341,7 +345,7 @@ const summaryLabelStyle = {
 
 const summaryValueStyle = {
   fontWeight: '600',
-  color: '#f8fafc',
+  color: 'var(--text-primary)',
 };
 
 const tabContentStyle = {

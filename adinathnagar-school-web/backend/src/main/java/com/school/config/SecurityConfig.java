@@ -60,6 +60,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
+                .requestMatchers("/api/javak-register/**").hasRole("ADMIN")
+                .requestMatchers("/api/aavak-register/**").hasRole("ADMIN")
+                .requestMatchers("/api/logs/**").hasRole("ADMIN")
+                .requestMatchers("/api/teachers/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/students/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/students/*/javak").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.disable())) // For H2 console
