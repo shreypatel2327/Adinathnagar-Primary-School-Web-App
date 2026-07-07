@@ -4,19 +4,6 @@ A complete, premium school management web application designed for Adinathnagar 
 
 ---
 
-## 🌟 Resume Quick-Copy Section (Remove Before Uploading to GitHub)
-
-If you are putting this project on your resume, here is a professional, high-impact description you can use:
-
-### **Adinathnagar Primary School Management System** | *Full Stack Java Developer*
-*   **Architecture & Security**: Engineered a secure RESTful API system using **Spring Boot 3** and **Spring Security (JWT)** to enforce rigid Role-Based Access Control (RBAC) separating administrative actions from standard teachers.
-*   **Data Scoping**: Architected SQL query scopes and standard-filtering JPA repositories to restrict teachers' read/write capabilities solely to their assigned class records, eliminating data leaks across class standards.
-*   **Docker Orchestration**: Configured multi-stage **Dockerfiles** and a unified **Docker Compose** layout containerizing a MySQL 8 database, the Java backend api, and Nginx-based React asset hosting to support zero-configuration deployments.
-*   **Custom Printing Engine**: Developed an A4 portrait scaling layout engine in **CSS (@media print)** to solve cross-browser print dialog alignment issues, centering and sizing Vali Form and Bonafide certificates dynamically.
-*   **Interactive UI Engine**: Designed a premium responsive frontend in **React** featuring custom sliding notification popups (Toast system), dynamic dark/light mode switches, and drawer navigation drawers adapting to mobile and desktop displays.
-
----
-
 ## 🚀 Key Features
 
 *   **Role-Based Separation (Admin vs. Teacher)**:
